@@ -1,8 +1,26 @@
 import React from 'react';
 import { render } from 'react-dom';
 import App from './App';
+import { IConfig } from './config/interfaces';
+import { Context } from './context/context';
+// import './stylesheets/index.css';
 
-render(
-  <App />,
-  document.body
-);
+window.addEventListener('DOMContentLoaded', (event) => {
+ window.parent.postMessage(JSON.stringify({ action: 'init' }), '*');
+ window.removeEventListener('DOMContentLoaded', () => null);
+});
+
+window.addEventListener('message', (event) => {
+ event.preventDefault();
+ if (!event.data || (typeof event.data !== 'string')) return;
+ const config: IConfig = JSON.parse(event.data);
+ console.log(config);
+ 
+ return render(
+   <Context.Provider value={JSON.stringify(config)}>
+     <App email={JSON.stringify(config)} />
+     {console.log('refferer ', document.referrer)}
+   </Context.Provider>,
+   document.body
+ );
+});
